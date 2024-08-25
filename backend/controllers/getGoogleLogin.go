@@ -1,26 +1,27 @@
 package controllers
 
 import (
+	"HangAroundBackend/services/googleauth"
 	"HangAroundBackend/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-// AddCashController godoc
-// @Summary Add cash to user account
-// @Description Add cash to user account
-// @Tags payment
-// @Accept  json
+// GetGoogleLoginUri godoc
+// @Summary Get google login uri
+// @Description Get the google login uri to redirect the user to google login page
+// @Tags GoogleAuth
 // @Produce  json
-// @Param amount body int true "Amount to add"
-// @Security ApiKeyAuth
-// @Success 200 {string} string "Successfully added cash"
+// @Success 200 {string} string "Successfully generated google login uri"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /payment/addcash [post]
+// @Router /api/v1/user/google [get]
 func GetGoogleLoginUri(c *gin.Context) {
-	// TODO: Implement get google auth
 
-	utils.SendSuccessResponse(c, 200, "Successfully added cash", nil)
+	uri, state := googleauth.GetURL()
+	utils.SendSuccessResponse(c, 200, "Successfully generated google login uri", gin.H{
+		"uri":   uri,
+		"state": state,
+	})
 }

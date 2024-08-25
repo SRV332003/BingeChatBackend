@@ -6,13 +6,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AddCashController godoc
-// @Summary Add cash to user account
-// @Description Add cash to user account
-// @Tags payment
+// RegisterUser godoc
+// @Summary Register a new user
+// @Description Register a new user
+// @Tags Auth
 // @Accept  json
 // @Produce  json
-// @Param amount body int true "Amount to add"
+// @Param name query string true "Name"
+// @Param email query string true "Email"
+// @Param password query string true "Password"
+// @Param passoutBatch query string true "Passout Batch"
+// @Param branch query string true "Branch"
+// @Param college query string true "College"
 // @Security ApiKeyAuth
 // @Success 200 {string} string "Successfully added cash"
 // @Failure 400 {string} string "Bad Request"

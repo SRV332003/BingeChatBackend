@@ -6,21 +6,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AddCashController godoc
-// @Summary Add cash to user account
-// @Description Add cash to user account
-// @Tags payment
+// ReCreateToken godoc
+// @Summary Refresh the access token
+// @Description Renew the access token using the refresh token
+// @Tags Auth
 // @Accept  json
 // @Produce  json
-// @Param amount body int true "Amount to add"
-// @Security ApiKeyAuth
-// @Success 200 {string} string "Successfully added cash"
+// @Param refresh_token query string true "Refresh token"
+// @Success 200 {string} string "Successfully generated new access token"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /payment/addcash [post]
+// @Router /api/v1/user/token [get]
 func ReCreateToken(c *gin.Context) {
-	// TODO: Implement get google auth
 
-	utils.SendSuccessResponse(c, 200, "Successfully added cash", nil)
+	utils.SendSuccessResponse(c, 200, "Successfully generated new access token", nil)
+	
 }

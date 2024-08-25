@@ -8,12 +8,12 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
+	github.com/swaggo/swag v1.8.12
 	go.uber.org/zap v1.27.0
 	golang.org/x/oauth2 v0.22.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.11
-	github.com/swaggo/swag v1.8.12
 )
 
 require (

@@ -10,10 +10,9 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// @title Strive Backend API
+// @title HangAround Backend API
 // @version 1.0
 // @description This is the documentation for backend APIs of Strive. You can explore the API endpoints here.
-
 func initRouter() *gin.Engine {
 	app := gin.Default()
 
@@ -23,14 +22,14 @@ func initRouter() *gin.Engine {
 		router.POST("/user", controllers.RegisterUser)
 		router.POST("/user/token", controllers.CreateToken)
 		router.GET("/user/token", controllers.ReCreateToken)
-		router.GET("/googlelogin", controllers.GetGoogleLoginUri)
+		router.GET("/user/google", controllers.GetGoogleLoginUri)
 		router.POST("/googlelogin", controllers.VerifyAuthCode)
 	}
 	router.Use(middlewares.AuthMiddlware)
 	{
 		router.PUT("/user", controllers.UpdateUser)
-		router.HEAD("/googlelogin", controllers.VerifyToken)
 		router.GET("/user", controllers.GetUser)
+		router.HEAD("/user/google", controllers.VerifyToken)
 		router.GET("/chat", socket.SocketController)
 	}
 

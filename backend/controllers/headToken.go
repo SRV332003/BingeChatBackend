@@ -6,21 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AddCashController godoc
-// @Summary Add cash to user account
-// @Description Add cash to user account
-// @Tags payment
-// @Accept  json
+// Verify Access Token godoc
+// @Summary Verify the access token
+// @Description Verify the access token using the token in Authorization header
+// @Tags Auth
 // @Produce  json
-// @Param amount body int true "Amount to add"
-// @Security ApiKeyAuth
-// @Success 200 {string} string "Successfully added cash"
+// @Param Authorization header string true "Bearer token"
+// @Security ApiKeyAuth|OAuth2Application
+// @Success 200 {string} string "Successfully verified access token"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /payment/addcash [post]
+// @Router /api/v1/user/token [head]
 func VerifyToken(c *gin.Context) {
-	// TODO: Implement get google auth
-
-	utils.SendSuccessResponse(c, 200, "Successfully added cash", nil)
+	// expects the token to be verified in the middleware
+	utils.SendSuccessResponse(c, 200, "Successfully verified access token", nil)
 }
