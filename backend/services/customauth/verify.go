@@ -17,7 +17,7 @@ func VerifyAccessToken(accessToken string) (*AccessTokenClaims, error) {
 	}
 
 	if !token.Valid {
-		return nil, errors.New("Invalid Token")
+		return nil, errors.New("invalid Token")
 	}
 	return claims, nil
 }

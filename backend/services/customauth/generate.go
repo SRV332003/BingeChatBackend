@@ -15,16 +15,18 @@ type AccessTokenClaims struct {
 	ID       uint   `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
+	Role     string `json:"role"`
 	jwt.RegisteredClaims
 }
 
-func GenerateAccessToken(id uint, email, username string) (string, error) {
+func GenerateAccessToken(id uint, email, username, role string) (string, error) {
 	expirationTime := time.Now().Add(4 * time.Hour)
 
 	claims := &AccessTokenClaims{
 		ID:       id,
 		Username: username,
 		Email:    email,
+		Role:     role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
