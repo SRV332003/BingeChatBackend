@@ -14,6 +14,7 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.11
+	moul.io/zapgorm2 v1.3.0
 )
 
 require (

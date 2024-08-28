@@ -8,37 +8,41 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"moul.io/zapgorm2"
 )
 
 var Instance *gorm.DB
 var dbError error
 
 func Connect(childLogger *zap.Logger) {
-	// dbLogger := zapgorm2.New(childLogger)
+	dbLogger := zapgorm2.New(childLogger)
 
 	connectionString := config.GetEnv("DB_CONNECTION_STRING")
 	Instance, dbError = gorm.Open(postgres.Open(connectionString), &gorm.Config{
-		// Logger: dbLogger,
+		Logger: dbLogger,
 	})
 	if dbError != nil {
-		log.Fatal(dbError)
-		panic("Cannot connect to DB")
+		childLogger.Panic("Error connecting to DB", zap.Error(dbError))
 	}
 	childLogger.Info("Connected to DB")
 }
 
 func Migrate(childLogger *zap.Logger) {
-	err := Instance.AutoMigrate(&models.UserAuth{})
+
+	err := Instance.AutoMigrate(&models.UserLogin{})
 	if err != nil {
-		childLogger.Error("Error migrating UserAuth", zap.Error(err))
-		panic(err)	
+		childLogger.Panic("Error migrating User", zap.Error(err))
 	}
-	err = Instance.AutoMigrate(&models.User{})
+
+	err = Instance.AutoMigrate(&models.UserInfo{})
 	if err != nil {
-		childLogger.Error("Error migrating User", zap.Error(err))
-		panic(err)
+		childLogger.Panic("Error migrating User", zap.Error(err))
 	}
-	// write log to file
+
+	err = Instance.AutoMigrate(&models.College{})
+	if err != nil {
+		childLogger.Panic("Error migrating College", zap.Error(err))
+	}
 
 	childLogger.Info("Migrated tables")
 }
