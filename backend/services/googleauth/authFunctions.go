@@ -67,11 +67,11 @@ func ResetToken(c *gin.Context, refreshToken string, accessToken string) (*oauth
 
 func init() {
 
-	if config.GetEnv("REDIRECT_URI") == "" || config.GetEnv("CLIENT_ID") == "" || config.GetEnv("CLIENT_SECRET") == "" {
+	if config.GetEnv("GOOGLE_REDIRECT_URI") == "" || config.GetEnv("GOOGLE_CLIENT_ID") == "" || config.GetEnv("GOOGLE_CLIENT_SECRET") == "" {
 		log.Fatal("Please set the environment variables REDIRECT_URL, CLIENT_ID and CLIENT_SECRET")
 	}
 
-	oauth2Config.RedirectURL = config.GetEnv("REDIRECT_URI")
-	oauth2Config.ClientID = config.GetEnv("CLIENT_ID")
-	oauth2Config.ClientSecret = config.GetEnv("CLIENT_SECRET")
+	oauth2Config.RedirectURL = config.GetEnv("GOOGLE_CLIENT_SECRET")
+	oauth2Config.ClientID = config.GetEnv("GOOGLE_CLIENT_ID")
+	oauth2Config.ClientSecret = config.GetEnv("GOOGLE_CLIENT_SECRET")
 }
