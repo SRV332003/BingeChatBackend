@@ -54,7 +54,7 @@ func VerifyUser(c *gin.Context) {
 	}
 
 	user.Verified = true
-	user.VerificationToken = ""
+	user.VerificationToken = "a"
 	err = crud.UpdateUserLogin(user)
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())

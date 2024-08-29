@@ -36,8 +36,16 @@ func ReCreateToken(c *gin.Context) {
 
 	// generate new access token
 	user, err := crud.GetUserLoginById(claims.ID)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error")
+		return
+	}
 
 	accessToken, err := customauth.GenerateAccessToken(user.ID, user.Email, user.Name, user.Role)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error")
+		return
+	}
 
 	utils.SendSuccessResponse(c, 200, "Successfully generated new access token", gin.H{
 		"access_token": accessToken,

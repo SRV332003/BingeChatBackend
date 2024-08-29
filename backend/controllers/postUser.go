@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"HangAroundBackend/models"
+	"HangAroundBackend/services/customauth"
 	"HangAroundBackend/services/db/crud"
 	"HangAroundBackend/services/mail"
 	"HangAroundBackend/utils"
@@ -118,7 +119,29 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	utils.SendSuccessResponse(c, 200, "User registered successfully, please verify your email", nil)
+	// generate refresh and access tokens
+	refreshToken, err := customauth.GenerateRefreshToken(user.ID)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+	accessToken, err := customauth.GenerateAccessToken(user.ID, user.Email, user.Name, user.Role)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+
+	user.RefreshToken = refreshToken    
+	err = crud.UpdateUserLogin(&user)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+
+	utils.SendSuccessResponse(c, 200, "User registered successfully, please verify your email", gin.H{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	})
 }
 
 //$2a$10$0K.dJFvzg91EjtSzZVKbo.SL3i9mgVqEptCxBPCud.6CwK6d/bZny

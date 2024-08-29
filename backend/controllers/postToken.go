@@ -47,15 +47,13 @@ func CreateToken(c *gin.Context) {
 	}
 
 	// validate email and password
-
-	// check if user exists
-	// hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	// if err != nil {
-	// 	utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
-	// 	return
-	// }hash := password
 	user, err := crud.GetUserLoginByEmail(email)
 	if err != nil {
+		utils.SendErrorResponse(c, 401, "Invalid email or password")
+		return
+	}
+
+	if user == nil {
 		utils.SendErrorResponse(c, 401, "Invalid email or password")
 		return
 	}
@@ -78,6 +76,13 @@ func CreateToken(c *gin.Context) {
 		return
 	}
 	accessToken, err := customauth.GenerateAccessToken(user.ID, user.Email, user.Name, user.Role)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+
+	user.RefreshToken = refreshToken
+	err = crud.UpdateUserLogin(user)
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
 		return
