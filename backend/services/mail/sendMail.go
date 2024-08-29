@@ -16,7 +16,7 @@ var smtpPort string
 var frontendUrl string
 var from string
 
-func sendMail(to []string, subject string, bodyBuf bytes.Buffer) error {
+func sendMail(to []string, bodyBuf bytes.Buffer) error {
 
 	// Sending email.
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, bodyBuf.Bytes())
@@ -25,7 +25,7 @@ func sendMail(to []string, subject string, bodyBuf bytes.Buffer) error {
 
 func SendVerificationMail(to []string, Name string, token string) error {
 	// Load email template from current directory.
-	t, err := template.ParseFiles("/services/mail/verifyTemplate.html")
+	t, err := template.ParseFiles("./services/mail/template.html")
 	if err != nil {
 		log.Println(err)
 		return err
@@ -46,7 +46,7 @@ func SendVerificationMail(to []string, Name string, token string) error {
 		NAME: Name,
 	})
 
-	err = sendMail(to, "Email Verification", bodyBuf)
+	err = sendMail(to, bodyBuf)
 	if err != nil {
 		log.Println(err)
 	} else {
