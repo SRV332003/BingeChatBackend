@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"HangAroundBackend/services/db/crud"
 	"HangAroundBackend/utils"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,14 @@ import (
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /api/v1/user [get]
 func GetUser(c *gin.Context) {
+	email := c.GetString("email")
 
-	utils.SendSuccessResponse(c, 200, "Successfully added cash", nil)
+	user, err := crud.GetUserInfoByEmail(email)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error")
+		return
+	}
+
+	utils.SendSuccessResponse(c, 200, "Successfully fetched user", user)
+
 }

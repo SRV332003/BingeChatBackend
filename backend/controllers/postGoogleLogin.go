@@ -6,6 +6,7 @@ import (
 	"HangAroundBackend/services/db/crud"
 	"HangAroundBackend/services/googleauth"
 	"HangAroundBackend/utils"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -69,12 +70,26 @@ func VerifyAuthCode(c *gin.Context) {
 		return
 	}
 
+	collegeEmailFormat := strings.Split(userData["email"].(string), "@")
+
+	exists, college, err := crud.CheckCollegeExists(collegeEmailFormat[1])
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+
+	if !exists {
+		utils.SendErrorResponse(c, 403, "Your college is not registered with us.")
+		return
+	}
+
 	// Create new user
 	userLogin = models.UserLogin{
-		Email:    userData["email"].(string),
-		Name:     userData["name"].(string),
-		Role:     "user",
-		Password: "",
+		Email:     userData["email"].(string),
+		Name:      userData["name"].(string),
+		Role:      "user",
+		Password:  "",
+		CollegeID: college.ID,
 	}
 
 	err = crud.CreateUserLogin(&userLogin)

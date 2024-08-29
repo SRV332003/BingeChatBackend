@@ -46,3 +46,12 @@ func UpdateCollegeStatus(college *models.College) error {
 	}
 	return nil
 }
+
+func CheckCollegeExists(emailFormat string) (bool, models.College, error) {
+	var college models.College
+	result := db.Instance.Where("email_format = ?", emailFormat).First(&college)
+	if result.Error != nil {
+		return false, college, result.Error
+	}
+	return true, college, nil
+}

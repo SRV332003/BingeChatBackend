@@ -4,23 +4,23 @@ import "gorm.io/gorm"
 
 type UserInfo struct {
 	gorm.Model
-	Rollno      string  `json:"rollno" gorm:"not null"`
-	College     College `json:"college"`
-	CollegeID   uint    `json:"college_id" gorm:"not null"`
-	Branch      string  `json:"branch" gorm:"not null"`
-	Course      string  `json:"course" gorm:"not null"`
-	PassoutYear string  `json:"passoutYear" gorm:"not null"`
-	DOB         string  `json:"dob" gorm:"not null"`
+	Rollno      string `json:"rollno" gorm:"not null"`
+	Branch      string `json:"branch" gorm:"not null"`
+	Course      string `json:"course" gorm:"not null"`
+	PassoutYear string `json:"passoutYear" gorm:"not null"`
+	DOB         string `json:"dob" gorm:"not null"`
 }
 
 type UserLogin struct {
 	gorm.Model
-	RefreshToken      string `json:"refresh_token"`
-	Verified          bool   `gorm:"default:false" json:"verified"`
-	VerificationToken string `json:"verification_token"`
-	Name              string `json:"name" gorm:"not null"`
-	Email             string `json:"email" gorm:"not null;unique"`
-	Role              string `json:"role" gorm:"not null default:'user'"` // user, admin
+	RefreshToken      string  `json:"refresh_token"`
+	Verified          bool    `gorm:"default:false" json:"verified"`
+	VerificationToken string  `json:"verification_token"`
+	Name              string  `json:"name" gorm:"not null"`
+	Email             string  `json:"email" gorm:"not null;unique"`
+	Role              string  `json:"role" gorm:"not null default:'user'"` // user, admin
+	College           College `json:"college"`
+	CollegeID         uint    `json:"college_id" gorm:"not null"`
 	Password          string
 	UserInfo          UserInfo `json:"user_info"`
 	UserInfoID        uint
