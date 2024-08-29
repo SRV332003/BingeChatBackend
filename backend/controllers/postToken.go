@@ -8,6 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type CreateTokenRequest struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 // Login godoc
 // @Summary Login
 // @Description Accepts user credentials and returns refresh and access tokens
@@ -22,8 +27,14 @@ import (
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /api/v1/user/login [post]
 func CreateToken(c *gin.Context) {
-	email := c.PostForm("email")
-	password := c.PostForm("password")
+	var req CreateTokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.SendErrorResponse(c, 400, "Bad Request: "+err.Error())
+		return
+	}
+
+	email := req.Email
+	password := req.Password
 
 	if email == "" {
 		utils.SendErrorResponse(c, 400, "Email is required")
