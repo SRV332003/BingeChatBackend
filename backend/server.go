@@ -24,9 +24,10 @@ func initRouter() *gin.Engine {
 		router.POST("/user/token", controllers.CreateToken)
 		router.GET("/user/token", controllers.ReCreateToken)
 		router.GET("/user/google", controllers.GetGoogleLoginUri)
-		router.POST("/googlelogin", controllers.VerifyAuthCode)
+		router.POST("/user/google", controllers.VerifyAuthCode)
 		router.GET("/college", controllers.GetCollege)
 		router.POST("/college", controllers.AddCollege)
+		router.POST("/user/verify", controllers.VerifyUser)
 	}
 	router.Use(middlewares.AuthMiddlware)
 	{
