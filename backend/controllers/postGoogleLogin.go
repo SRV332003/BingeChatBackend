@@ -62,6 +62,10 @@ func VerifyAuthCode(c *gin.Context) {
 		}
 
 		refresh_token, err := customauth.GenerateRefreshToken(userLogin.ID)
+		if err != nil {
+			utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+			return
+		}
 
 		utils.SendSuccessResponse(c, 200, "User successfully logged in", gin.H{
 			"access_token":  access_token,
@@ -83,27 +87,30 @@ func VerifyAuthCode(c *gin.Context) {
 		return
 	}
 
-	// Create new user
-	userLogin = models.UserLogin{
-		Email:     userData["email"].(string),
-		Name:      userData["name"].(string),
-		Role:      "user",
-		Password:  "",
-		CollegeID: college.ID,
-	}
-
-	err = crud.CreateUserLogin(&userLogin)
-	if err != nil {
-		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
-		return
-	}
-
 	access_token, err := customauth.GenerateAccessToken(userLogin.ID, userLogin.Email, userLogin.Name, userLogin.Role)
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
 		return
 	}
 	refresh_token, err := customauth.GenerateRefreshToken(userLogin.ID)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+
+	// Create new user
+	userLogin = models.UserLogin{
+		Email:             userData["email"].(string),
+		Name:              userData["name"].(string),
+		Role:              "user",
+		Password:          "",
+		CollegeID:         college.ID,
+		Verified:          true,
+		VerificationToken: "",
+		RefreshToken:      refresh_token,
+	}
+
+	err = crud.CreateUserLogin(&userLogin)
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
 		return

@@ -24,5 +24,4 @@ func GetGoogleLoginUri(c *gin.Context) {
 		"uri":   uri,
 		"state": state,
 	})
-	return
 }
