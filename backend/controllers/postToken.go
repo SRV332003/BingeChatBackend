@@ -6,6 +6,7 @@ import (
 	"HangAroundBackend/utils"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type CreateTokenRequest struct {
@@ -48,9 +49,25 @@ func CreateToken(c *gin.Context) {
 	// validate email and password
 
 	// check if user exists
-	user, err := crud.ValidateLogin(email, password)
+	// hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	// if err != nil {
+	// 	utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+	// 	return
+	// }hash := password
+	user, err := crud.GetUserLoginByEmail(email)
 	if err != nil {
 		utils.SendErrorResponse(c, 401, "Invalid email or password")
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		utils.SendErrorResponse(c, 401, "Invalid email or password")
+		return
+	}
+
+	if !user.Verified {
+		utils.SendErrorResponse(c, 401, "User not verified, please check your email for verification link")
 		return
 	}
 

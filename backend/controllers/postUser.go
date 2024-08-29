@@ -3,7 +3,9 @@ package controllers
 import (
 	"HangAroundBackend/models"
 	"HangAroundBackend/services/db/crud"
+	"HangAroundBackend/services/mail"
 	"HangAroundBackend/utils"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +16,7 @@ type RegisterUserRequest struct {
 	Name      string `json:"name" binding:"required"`
 	Email     string `json:"email" binding:"required"`
 	Password  string `json:"password" binding:"required"`
-	CollegeID uint   `json:"collegeId" binding:"required"`
+	CollegeID string `json:"collegeId" binding:"required"`
 }
 
 // RegisterUser godoc
@@ -43,7 +45,11 @@ func RegisterUser(c *gin.Context) {
 	name := req.Name
 	email := req.Email
 	password := req.Password
-	collegeId := req.CollegeID
+	collegeId, err := strconv.Atoi(req.CollegeID)
+	if err != nil {
+		utils.SendErrorResponse(c, 400, "Invalid college ID")
+		return
+	}
 
 	if name == "" || email == "" || password == "" || collegeId == 0 {
 		utils.SendErrorResponse(c, 400, "All fields are required")
@@ -53,14 +59,14 @@ func RegisterUser(c *gin.Context) {
 	// validate email and password
 
 	// check if user exists
-	_, err := crud.GetUserLoginByEmail(email)
+	_, err = crud.GetUserLoginByEmail(email)
 	if err == nil {
 		utils.SendErrorResponse(c, 401, "User already exists")
 		return
 	}
 
 	// verify college
-	college, err := crud.GetCollegeById(collegeId)
+	college, err := crud.GetCollegeById(uint(collegeId))
 	if err != nil {
 		utils.SendErrorResponse(c, 400, "Invalid college ID")
 		return
@@ -83,12 +89,27 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	verifyToken, err := bcrypt.GenerateFromPassword([]byte(email+password), bcrypt.DefaultCost)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+
+	// hashedPassword := password
 	user := models.UserLogin{
-		Name:      name,
-		Email:     email,
-		Password:  string(hashedPassword),
-		CollegeID: collegeId,
-		Role:      "user",
+		Name:              name,
+		Email:             email,
+		Password:          string(hashedPassword),
+		CollegeID:         uint(collegeId),
+		Role:              "user",
+		VerificationToken: string(verifyToken),
+		Verified:          false,
+	}
+
+	err = mail.SendVerificationMail([]string{email}, name, string(verifyToken))
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
 	}
 
 	err = crud.CreateUserLogin(&user)
@@ -97,5 +118,8 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	utils.SendSuccessResponse(c, 200, "Successfully added cash", nil)
+	utils.SendSuccessResponse(c, 200, "User registered successfully, please verify your email", nil)
 }
+
+//$2a$10$0K.dJFvzg91EjtSzZVKbo.SL3i9mgVqEptCxBPCud.6CwK6d/bZny
+//$2a$10$gP8UirrbS/VMcfeSYykmtOvI6To.kQzgdHnhpLdrhR7Ja4YutmBP2
