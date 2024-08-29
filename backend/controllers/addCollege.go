@@ -4,9 +4,15 @@ import (
 	"HangAroundBackend/models"
 	"HangAroundBackend/services/db/crud"
 	"HangAroundBackend/utils"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
+
+type AddCollegeRequest struct {
+	Name        string `json:"name" binding:"required"`
+	EmailFormat string `json:"emailFormat" binding:"required"`
+}
 
 // AddCollege godoc
 // @Summary Add a new college
@@ -18,17 +24,22 @@ import (
 // @Param emailFormat formData string true "Email Format"
 // @Router /api/v1/college [post]
 func AddCollege(c *gin.Context) {
-	role := c.GetString("role")
-	if role != "admin" {
-		utils.SendErrorResponse(c, 403, "You are not authorized to add college")
+	// role := c.GetString("role")
+	// if role != "admin" {
+	// 	utils.SendErrorResponse(c, 403, "You are not authorized to add college")
+	// 	return
+	// }
+
+	var req AddCollegeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.SendErrorResponse(c, 400, "Bad Request: "+err.Error())
 		return
 	}
+	log.Println(req)
+	name := req.Name
+	emailFormat := req.EmailFormat
 
-	name := c.PostForm("name")
-	college_id := c.PostForm("college_id")
-	emailFormat := c.PostForm("emailFormat")
-
-	if name == "" || college_id == "" || emailFormat == "" {
+	if name == "" || emailFormat == "" {
 		utils.SendErrorResponse(c, 400, "Please provide all the required fields")
 		return
 	}
@@ -36,22 +47,17 @@ func AddCollege(c *gin.Context) {
 	college := models.College{
 		Name:        name,
 		EmailFormat: emailFormat,
-		Verified:    false,
+		Verified:    true,
 	}
 
 	// Check if college already exists
-	exists, _, err := crud.CheckCollegeExists(emailFormat)
-	if err != nil {
-		utils.SendErrorResponse(c, 500, "Error checking college")
-		return
-	}
-
+	exists, _, _ := crud.CheckCollegeExists(emailFormat)
 	if exists {
 		utils.SendErrorResponse(c, 400, "College already exists")
 		return
 	}
 
-	err = crud.CreateCollege(&college)
+	err := crud.CreateCollege(&college)
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Error adding college")
 		return
