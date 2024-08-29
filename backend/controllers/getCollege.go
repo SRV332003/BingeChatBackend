@@ -19,7 +19,7 @@ import (
 // @Router /api/v1/user [get]
 func GetCollege(c *gin.Context) {
 
-	colleges, err := crud.GetAllColleges()
+	colleges, err := crud.GetAllCollegesNames()
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Internal Server Error")
 		return
