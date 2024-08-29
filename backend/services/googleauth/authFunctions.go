@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -66,10 +65,6 @@ func ResetToken(c *gin.Context, refreshToken string, accessToken string) (*oauth
 }
 
 func init() {
-
-	if config.GetEnv("GOOGLE_REDIRECT_URI") == "" || config.GetEnv("GOOGLE_CLIENT_ID") == "" || config.GetEnv("GOOGLE_CLIENT_SECRET") == "" {
-		log.Fatal("Please set the environment variables REDIRECT_URL, CLIENT_ID and CLIENT_SECRET")
-	}
 
 	oauth2Config.RedirectURL = config.GetEnv("GOOGLE_CLIENT_SECRET")
 	oauth2Config.ClientID = config.GetEnv("GOOGLE_CLIENT_ID")
