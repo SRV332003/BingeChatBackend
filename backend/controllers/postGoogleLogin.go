@@ -9,7 +9,12 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
+
+type verifyAuthCodeReq struct {
+	Code string `json:"code" binding:"required"`
+}
 
 // VerifyAuthCode godoc
 // @Summary Verify the google auth code
@@ -24,7 +29,13 @@ import (
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /api/v1/user/google [post]
 func VerifyAuthCode(c *gin.Context) {
-	code := c.PostForm("code")
+	var req verifyAuthCodeReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.SendErrorResponse(c, 400, "Bad Request: "+err.Error())
+		return
+	}
+
+	code := req.Code
 
 	if code == "" {
 		utils.SendErrorResponse(c, 400, "Auth code cannot be empty")
@@ -98,12 +109,21 @@ func VerifyAuthCode(c *gin.Context) {
 		return
 	}
 
+	// generate random password
+	password := utils.GenerateRandomPassword(10)
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+
 	// Create new user
 	userLogin = models.UserLogin{
 		Email:             userData["email"].(string),
 		Name:              userData["name"].(string),
 		Role:              "user",
-		Password:          "",
+		Password:          string(hashedPassword),
 		CollegeID:         college.ID,
 		Verified:          true,
 		VerificationToken: "",
