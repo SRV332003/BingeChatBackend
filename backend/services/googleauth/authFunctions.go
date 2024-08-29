@@ -15,7 +15,6 @@ import (
 )
 
 const userInfoAPI = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
-const refreshTokenAPI = "https://www.googleapis.com/oauth2/v4/token"
 
 var oauth2Config = oauth2.Config{
 	ClientID:     "YOUR_CLIENT",
@@ -66,7 +65,7 @@ func ResetToken(c *gin.Context, refreshToken string, accessToken string) (*oauth
 
 func init() {
 
-	oauth2Config.RedirectURL = config.GetEnv("GOOGLE_CLIENT_SECRET")
+	oauth2Config.RedirectURL = config.GetEnv("GOOGLE_REDIRECT_URI")
 	oauth2Config.ClientID = config.GetEnv("GOOGLE_CLIENT_ID")
 	oauth2Config.ClientSecret = config.GetEnv("GOOGLE_CLIENT_SECRET")
 }
