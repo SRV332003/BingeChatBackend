@@ -13,35 +13,40 @@ import (
 var auth smtp.Auth
 var smtpHost string
 var smtpPort string
+var frontendUrl string
 var from string
 
-func SendMail(to []string, Name string, subject string, bodyBuf bytes.Buffer) error {
+func sendMail(to []string, subject string, bodyBuf bytes.Buffer) error {
 
 	// Sending email.
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, bodyBuf.Bytes())
 	return err
 }
 
-func SendOTPMail(to []string, Name string, OTP int) error {
+func SendVerificationMail(to []string, Name string, token string) error {
 	// Load email template from current directory.
-	t, err := template.ParseFiles("auth/services/mail/verifyTemplate.html")
+	t, err := template.ParseFiles("/services/mail/verifyTemplate.html")
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
+	url := frontendUrl + "/verifyUser?token=" + token
+
 	var bodyBuf bytes.Buffer
 
 	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	bodyBuf.Write([]byte(fmt.Sprintf("Subject: %s \n%s\n\n", " Strive OTP Verification", mimeHeaders)))
+	bodyBuf.Write([]byte(fmt.Sprintf("Subject: %s \n%s\n\n", "Email Verification for HangAround", mimeHeaders)))
 
 	t.Execute(&bodyBuf, struct {
-		OTP int
+		LINK string
+		NAME string
 	}{
-		OTP: OTP,
+		LINK: url,
+		NAME: Name,
 	})
 
-	err = SendMail(to, Name, "Email Verification", bodyBuf)
+	err = sendMail(to, "Email Verification", bodyBuf)
 	if err != nil {
 		log.Println(err)
 	} else {
@@ -54,6 +59,7 @@ func SendOTPMail(to []string, Name string, OTP int) error {
 func init() {
 	from = config.GetEnv("MAIL_SERVICE_EMAIL")
 	password := config.GetEnv("MAIL_SERVICE_PASSWORD")
+	frontendUrl = config.GetEnv("CORS_ORIGIN")
 	// smtp server configuration.
 	smtpHost = "smtp.gmail.com"
 	smtpPort = "587"
