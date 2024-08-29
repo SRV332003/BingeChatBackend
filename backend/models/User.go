@@ -4,11 +4,11 @@ import "gorm.io/gorm"
 
 type UserInfo struct {
 	gorm.Model
-	Rollno      string `json:"rollno" gorm:"not null"`
-	Branch      string `json:"branch" gorm:"not null"`
-	Course      string `json:"course" gorm:"not null"`
-	PassoutYear string `json:"passoutYear" gorm:"not null"`
-	DOB         string `json:"dob" gorm:"not null"`
+	Rollno      string `json:"rollno"`
+	Branch      string `json:"branch" `
+	Course      string `json:"course" `
+	PassoutYear string `json:"passoutYear"`
+	DOB         string `json:"dob"`
 }
 
 type UserLogin struct {
@@ -22,8 +22,7 @@ type UserLogin struct {
 	College           College `json:"college"`
 	CollegeID         uint    `json:"college_id" gorm:"not null"`
 	Password          string
-	UserInfo          UserInfo `json:"user_info"`
-	UserInfoID        uint
+	UserInfo       uint
 }
 
 type College struct {
