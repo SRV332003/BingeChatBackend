@@ -22,6 +22,15 @@ func GetCollegeById(id uint) (*models.College, error) {
 	return &college, nil
 }
 
+func GetAllColleges() ([]models.College, error) {
+	var colleges []models.College
+	result := db.Instance.Find(&colleges, "verified = ?", true)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return colleges, nil
+}
+
 func GetVerifiedColleges() ([]models.College, error) {
 	var colleges []models.College
 	result := db.Instance.Where("verified = ?", true).Find(&colleges)
