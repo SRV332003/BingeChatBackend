@@ -2,7 +2,6 @@ package googleauth
 
 import (
 	"HangAroundBackend/config"
-
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"

@@ -13,6 +13,7 @@ require (
 	golang.org/x/oauth2 v0.22.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/postgres v1.5.9
+	golang.org/x/crypto v0.23.0
 	gorm.io/gorm v1.25.11
 	moul.io/zapgorm2 v1.3.0
 )
@@ -56,7 +57,6 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect

@@ -16,7 +16,6 @@ import (
 func initRouter() *gin.Engine {
 	app := gin.Default()
 
-	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	app.Use(middlewares.CORSMiddleware())
 	router := app.Group("/api/v1")
 	{
@@ -36,6 +35,8 @@ func initRouter() *gin.Engine {
 		router.HEAD("/user/google", controllers.VerifyToken)
 		router.GET("/chat", socket.SocketController)
 	}
+
+	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return app
 }

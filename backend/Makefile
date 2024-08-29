@@ -1,4 +1,4 @@
-HangAroundBackend: docs/swagger.json go.sum
+HangAroundBackend:  go.sum
 	@echo "Building HangAroundBackend"
 	@go build -o HangAroundBackend .
 
@@ -9,3 +9,8 @@ docs/swagger.json: $(shell find . -name '*.go')
 go.sum, go.mod: go.mod
 	@echo "Updating go.sum"
 	@go mod tidy
+
+
+run: HangAroundBackend
+	@echo "Running HangAroundBackend"
+	@go run .

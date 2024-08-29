@@ -20,9 +20,7 @@ type verifyAuthCodeReq struct {
 // @Summary Verify the google auth code
 // @Description Verify the google auth code and return the access token with the user details
 // @Tags Auth
-// @Accept  json
-// @Produce  json
-// @Param code formData string true "Google Auth Code"
+// @Param code body string true "Google Auth Code"
 // @Success 200 {string} string "Successfully added cash"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 401 {string} string "Unauthorized"
@@ -54,11 +52,7 @@ func VerifyAuthCode(c *gin.Context) {
 		return
 	}
 
-	res, userLogin, err := crud.CheckUserLoginExists(userData["email"].(string))
-	if err != nil {
-		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
-		return
-	}
+	res, userLogin, _ := crud.CheckUserLoginExists(userData["email"].(string))
 
 	if res {
 		if userLogin.Email != userData["email"].(string) {
@@ -85,27 +79,11 @@ func VerifyAuthCode(c *gin.Context) {
 		return
 	}
 
-	collegeEmailFormat := strings.Split(userData["email"].(string), "@")
+	splitMail := strings.Split(userData["email"].(string), "@")
 
-	exists, college, err := crud.CheckCollegeExists(collegeEmailFormat[1])
-	if err != nil {
-		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
-		return
-	}
-
-	if !exists {
+	exists, college, err := crud.CheckCollegeExists(splitMail[1])
+	if !exists || err != nil {
 		utils.SendErrorResponse(c, 403, "Your college is not registered with us.")
-		return
-	}
-
-	access_token, err := customauth.GenerateAccessToken(userLogin.ID, userLogin.Email, userLogin.Name, userLogin.Role)
-	if err != nil {
-		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
-		return
-	}
-	refresh_token, err := customauth.GenerateRefreshToken(userLogin.ID)
-	if err != nil {
-		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
 		return
 	}
 
@@ -118,6 +96,9 @@ func VerifyAuthCode(c *gin.Context) {
 		return
 	}
 
+	if userData["name"] == nil {
+		userData["name"] = splitMail[0]
+	}
 	// Create new user
 	userLogin = models.UserLogin{
 		Email:             userData["email"].(string),
@@ -127,7 +108,6 @@ func VerifyAuthCode(c *gin.Context) {
 		CollegeID:         college.ID,
 		Verified:          true,
 		VerificationToken: "",
-		RefreshToken:      refresh_token,
 	}
 
 	err = crud.CreateUserLogin(&userLogin)
@@ -136,8 +116,27 @@ func VerifyAuthCode(c *gin.Context) {
 		return
 	}
 
+	// generate refresh and access tokens
+	refreshToken, err := customauth.GenerateRefreshToken(userLogin.ID)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+	accessToken, err := customauth.GenerateAccessToken(userLogin.ID, userLogin.Email, userLogin.Name, userLogin.Role)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+
+	userLogin.RefreshToken = refreshToken
+	err = crud.UpdateUserLogin(&userLogin)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
+		return
+	}
+
 	utils.SendSuccessResponse(c, 200, "User partially registered, please complete the registration", gin.H{
-		"access_token":  access_token,
-		"refresh_token": refresh_token,
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
 	})
 }
