@@ -42,6 +42,18 @@ func GetUserByRefreshToken(refreshToken string) (*models.UserLogin, error) {
 	return &user, nil
 }
 
+func GetUserByVerificationToken(verificationToken string) (*models.UserLogin, error) {
+	var user models.UserLogin
+	result := db.Instance.Where("verification_token = ?", verificationToken).First(&user)
+	if result.RowsAffected > 1 {
+		db.Instance.Logger.Warn(db.Instance.Statement.Context, "More than one user found with the same verification token", "verification_token", verificationToken)
+	}
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}
+
 func UpdateUserLogin(user *models.UserLogin) error {
 	tx := db.Instance.Begin()
 	result := tx.Model(&models.UserLogin{}).Where("id = ?", user.ID).Updates(user)
@@ -102,7 +114,7 @@ func CheckUserInfoExists(id uint) (bool, error) {
 	if result.RowsAffected < 1 {
 		return false, nil
 	}
-	if user.UserInfoID == 0 {
+	if user.UserInfo == 0 {
 		return false, nil
 	}
 	return true, nil
