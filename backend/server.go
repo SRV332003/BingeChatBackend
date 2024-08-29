@@ -17,6 +17,7 @@ func initRouter() *gin.Engine {
 	app := gin.Default()
 
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	app.Use(middlewares.CORSMiddleware())
 	router := app.Group("/api/v1")
 	{
 		router.POST("/user", controllers.RegisterUser)
@@ -24,6 +25,8 @@ func initRouter() *gin.Engine {
 		router.GET("/user/token", controllers.ReCreateToken)
 		router.GET("/user/google", controllers.GetGoogleLoginUri)
 		router.POST("/googlelogin", controllers.VerifyAuthCode)
+		router.GET("/college", controllers.GetCollege)
+		router.POST("/college", controllers.AddCollege)
 	}
 	router.Use(middlewares.AuthMiddlware)
 	{
