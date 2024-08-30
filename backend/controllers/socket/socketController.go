@@ -1,10 +1,14 @@
 package socket
 
 import (
-	"HangAroundBackend/utils"
+	"HangAroundBackend/logger"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
+
+var SocketLogger *zap.Logger
+var manager *Manager
 
 // AddCashController godoc
 // @Summary Add cash to user account
@@ -13,14 +17,22 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param amount body int true "Amount to add"
-// @Security ApiKeyAuth
 // @Success 200 {string} string "Successfully added cash"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /payment/addcash [post]
 func SocketController(c *gin.Context) {
-	// TODO: Implement get google auth
+	manager.HandleConnections(c)
+}
 
-	utils.SendSuccessResponse(c, 200, "Successfully added cash", nil)
+func init() {
+	SocketLogger = logger.GetLoggerWithName("socket")
+	manager = NewManager()
+}
+
+func CloseSocket() {
+	manager.Lock()
+	manager.Close()
+	manager.Unlock()
 }
