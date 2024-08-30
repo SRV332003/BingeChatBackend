@@ -44,6 +44,7 @@ func AuthMiddlware(c *gin.Context) {
 
 	c.Set("email", claims.Email)
 	c.Set("role", claims.Role)
+	c.Set("name", claims.Username)
 
 	c.Next()
 
