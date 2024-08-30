@@ -1,16 +1,15 @@
 package controllers
 
 import (
-	"HangAroundBackend/models"
 	"HangAroundBackend/services/db/crud"
 	"HangAroundBackend/utils"
-	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
-type AddCollegeRequest struct {
+type VerCollegeRequest struct {
 	Name        string `json:"name" binding:"required"`
+	CollegeID   string `json:"college_id" binding:"required"`
 	EmailFormat string `json:"emailFormat" binding:"required"`
 }
 
@@ -23,45 +22,43 @@ type AddCollegeRequest struct {
 // @Param name formData string true "CollegeName"
 // @Param emailFormat formData string true "Email Format"
 // @Router /api/v1/college [post]
-func AddCollege(c *gin.Context) {
+func VerCollege(c *gin.Context) {
 	role := c.GetString("role")
 	if role != "admin" {
 		utils.SendErrorResponse(c, 403, "You are not authorized to add college")
 		return
 	}
 
-	var req AddCollegeRequest
+	var req VerCollegeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.SendErrorResponse(c, 400, "Bad Request: "+err.Error())
 		return
 	}
-	log.Println(req)
+
 	name := req.Name
+	college_id := req.CollegeID
 	emailFormat := req.EmailFormat
 
-	if name == "" || emailFormat == "" {
+	if name == "" || college_id == "" || emailFormat == "" {
 		utils.SendErrorResponse(c, 400, "Please provide all the required fields")
 		return
 	}
 
-	college := models.College{
-		Name:        name,
-		EmailFormat: emailFormat,
-		Verified:    true,
-	}
-
 	// Check if college already exists
-	exists, _, _ := crud.CheckCollegeExists(emailFormat)
-	if exists {
-		utils.SendErrorResponse(c, 400, "College already exists")
+	exists, college, err := crud.CheckCollegeExists(emailFormat)
+
+	if !exists || err != nil {
+		utils.SendErrorResponse(c, 400, "College does not exist")
 		return
 	}
 
-	err := crud.CreateCollege(&college)
+	college.Verified = true
+
+	err = crud.UpdateCollegeStatus(&college)
 	if err != nil {
-		utils.SendErrorResponse(c, 500, "Error adding college")
+		utils.SendErrorResponse(c, 500, "Error Updating College status")
 		return
 	}
 
-	utils.SendSuccessResponse(c, 200, "College added successfully", college)
+	utils.SendSuccessResponse(c, 200, "College Verified successfully!!", college)
 }
