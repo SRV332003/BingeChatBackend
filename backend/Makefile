@@ -1,4 +1,4 @@
-HangAroundBackend:  go.sum
+HangAroundBackend:  go.sum  $(shell find . -name '*.go') 
 	@echo "Building HangAroundBackend"
 	@go build -o HangAroundBackend .
 
@@ -13,4 +13,4 @@ go.sum, go.mod: go.mod
 
 run: HangAroundBackend
 	@echo "Running HangAroundBackend"
-	@go run .
+	@./HangAroundBackend
