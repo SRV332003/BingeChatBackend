@@ -12,11 +12,16 @@ import (
 
 func AuthMiddlware(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
+	token := c.Query("token")
 
-	if authHeader == "" {
+	if authHeader == "" && token == "" {
 		utils.SendErrorResponse(c, http.StatusUnauthorized, "Invalid authorization header")
 		c.AbortWithStatus(401)
 		return
+	}
+
+	if authHeader == "" {
+		authHeader = "Bearer " + token
 	}
 
 	//Expecting format of Bearer token
