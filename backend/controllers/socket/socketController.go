@@ -29,10 +29,9 @@ func SocketController(c *gin.Context) {
 func init() {
 	SocketLogger = logger.GetLoggerWithName("socket")
 	manager = NewManager()
+	go manager.RoomDispatcher()
 }
 
 func CloseSocket() {
-	manager.Lock()
 	manager.Close()
-	manager.Unlock()
 }

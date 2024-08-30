@@ -25,25 +25,48 @@ func (r *Room) Start() {
 		go client.Writer()
 		go client.Reader()
 	}
-	r.Send(Event{
-		Type: openEvent,
-		Data: json.RawMessage(`{"message": "Room Opened"}`),
-	}, r.clients[0])
+	r.Send(json.RawMessage([]byte(`{"type": "init", "user": "`+r.clients[1].name+`"}`)), r.clients[0])
 }
 
-func (r *Room) Send(event Event, sender *Client) {
+func (r *Room) Send(data json.RawMessage, sender *Client) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch r := r.(type) {
+			case string:
+				SocketLogger.Error("Recovered from panic: " + r)
+			case error:
+				SocketLogger.Error("Recovered from panic: " + r.Error())
+			default:
+				SocketLogger.Error("Recovered from panic")
+			}
+		}
+	}()
 	for _, client := range r.clients {
 		if client != sender {
-			// send event to client
-			client.ch <- event.Data
+			// send message data to client
+			SocketLogger.Info("Sending message " + string(data) + " to " + client.email + " from " + sender.email)
+			client.ch <- data
 		}
 	}
 }
 
 func (r *Room) Close() {
+	defer func() {
+		if r := recover(); r != nil {
+			switch r := r.(type) {
+			case string:
+				SocketLogger.Error("Recovered from panic: " + r)
+			case error:
+				SocketLogger.Error("Recovered from panic: " + r.Error())
+			default:
+				SocketLogger.Error("Recovered from panic")
+			}
+		}
+	}()
 	for _, client := range r.clients {
-		client.conn.Close()
 		close(client.ch)
+		client.conn.Close()
 	}
 	r.Manager.RemoveRoom(r)
+
 }

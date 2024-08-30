@@ -17,15 +17,16 @@ type Client struct {
 	ch        chan []byte
 	email     string
 	collegeID string
+	name      string
 }
 
 const (
-	pongInterval = 10 * time.Second
+	pongInterval = 5 * time.Second
 	pingInterval = (pongInterval * 9) / 10
 )
 
-func NewClient(conn *websocket.Conn, manager *Manager, email string, collegeID string) *Client {
-	return &Client{conn: conn, room: nil, ch: make(chan []byte), email: email, collegeID: collegeID}
+func NewClient(conn *websocket.Conn, manager *Manager, email string, collegeID string, name string) *Client {
+	return &Client{conn: conn, room: nil, ch: make(chan []byte), email: email, collegeID: collegeID, name: name}
 }
 
 func (c *Client) Reader() {
@@ -43,7 +44,6 @@ func (c *Client) Reader() {
 	c.conn.SetPongHandler(c.pongHandler)
 
 	for {
-
 		_, payload, err := c.conn.ReadMessage()
 		if err != nil {
 			c.room.Close()
@@ -54,27 +54,12 @@ func (c *Client) Reader() {
 		if err != nil {
 			log.Println("Unable to unmarshal msg:", err)
 		}
-
-		if msg.Type == chatMessageEvent {
-			var chatMsg ChatMessageEventData
-			err = json.Unmarshal(msg.Data, &chatMsg)
-			if err != nil {
-				log.Println("Unable to unmarshal data:", err)
-			}
-
-			payload, err = json.Marshal(chatMsg)
-			if err != nil {
-				log.Println("Unable to marshal msg:", err)
-			}
-
+		if msg.Type == initEvent {
+			SocketLogger.Warn("Init event received")
+		} else if msg.Type == exchangeEvent {
+			SocketLogger.Info("Exchange event received")
+			c.room.Send(msg.Data, c)
 		}
-
-		var event Event
-		event.Data = payload
-		event.Type = msg.Type
-
-		c.room.Send(event, c)
-
 	}
 }
 
@@ -98,6 +83,7 @@ func (c *Client) Writer() {
 			}
 			// log.Println("Message sent:", msg)
 		case <-t.C:
+			SocketLogger.Info("Sending ping to " + c.name)
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				SocketLogger.Error("Unable to send ping: " + err.Error())
 				return
@@ -110,5 +96,6 @@ func (c *Client) Writer() {
 }
 
 func (c *Client) pongHandler(string) error {
+	SocketLogger.Info("pong recieved from " + c.name)
 	return c.conn.SetReadDeadline(time.Now().Add(pongInterval))
 }

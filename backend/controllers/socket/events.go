@@ -3,20 +3,17 @@ package socket
 import "encoding/json"
 
 type Event struct {
-	Type string          `json:"type"`
+	Type string          `json:"identifier"`
 	Data json.RawMessage `json:"data"`
 }
 
 const (
 	// Event types
-	cursorMoveEvent     = "cursorMove"
-	chatMessageEvent    = "chatMessage"
-	openEvent           = "openEvent"
-	commentMessageEvent = "commentMessage"
+	exchangeEvent = "exchange"
+	initEvent     = "initEvent"
 )
 
-type ChatMessageEventData struct {
-	Username string `json:"username"`
-	Message  string `json:"message"`
-	Time     string `json:"time"`
+func (e Event) ToJSON() []byte {
+	data, _ := json.Marshal(e)
+	return data
 }
