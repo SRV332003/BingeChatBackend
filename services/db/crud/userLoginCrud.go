@@ -119,3 +119,15 @@ func CheckUserInfoExists(id uint) (bool, error) {
 	}
 	return true, nil
 }
+
+func CheckUserVerified(email string) (bool, error) {
+	var user models.UserLogin
+	result := db.Instance.Where("email = ?", email).First(&user)
+	if result.RowsAffected > 1 {
+		db.Instance.Logger.Warn(db.Instance.Statement.Context, "More than one user found with the same email", "email", email)
+	}
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return user.Verified, nil
+}

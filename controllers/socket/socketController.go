@@ -2,6 +2,9 @@ package socket
 
 import (
 	"HangAroundBackend/logger"
+	"HangAroundBackend/services/db/crud"
+	"HangAroundBackend/utils"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -23,6 +26,21 @@ var manager *Manager
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /payment/addcash [post]
 func SocketController(c *gin.Context) {
+
+	email := c.GetString("email")
+	verified, err := crud.CheckUserVerified(email)
+	if err != nil {
+		SocketLogger.Error("Error in checking user verification", zap.Error(err))
+		utils.SendErrorResponse(c, 500, "Internal Server Error")
+		return
+	}
+
+	if !verified {
+		SocketLogger.Warn("User not verified")
+		utils.SendErrorResponse(c, http.StatusNotAcceptable, "User not verified, please verify from link sent to your email")
+		return
+	}
+
 	manager.HandleConnections(c)
 }
 
