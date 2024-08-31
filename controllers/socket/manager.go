@@ -72,6 +72,7 @@ func (m *Manager) AddClient(client *Client) {
 
 func (m *Manager) RoomDispatcher() {
 	for client := range m.queue {
+		SocketLogger.Info("Room Dispatcher dealing with client: " + client.name)
 		_, exist := m.clients[client.collegeID]
 		if !exist {
 			m.clients[client.collegeID] = make([]*Client, 0)
