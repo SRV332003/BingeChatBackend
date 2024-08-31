@@ -6,6 +6,8 @@ import (
 	"HangAroundBackend/services/db/crud"
 	"HangAroundBackend/services/mail"
 	"HangAroundBackend/utils"
+	"HangAroundBackend/utils/validators"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -31,7 +33,7 @@ type RegisterUserRequest struct {
 // @Param password json string true "Password"
 // @Param collegeID json string true "College ID"
 // @Success 200 {string} string "Successfully added cash"
-// @Failure 400 {string} string "Bad Request"
+// @Failure http.StatusBadRequest {string} string "Bad Request"
 // @Failure 401 {string} string "Unauthorized"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /payment/addcash [post]
@@ -39,7 +41,7 @@ func RegisterUser(c *gin.Context) {
 
 	var req RegisterUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.SendErrorResponse(c, 400, "Bad Request: "+err.Error())
+		utils.SendErrorResponse(c, http.StatusBadRequest, "Bad Request: "+err.Error())
 		return
 	}
 
@@ -47,39 +49,58 @@ func RegisterUser(c *gin.Context) {
 	email := req.Email
 	password := req.Password
 	collegeId, err := strconv.Atoi(req.CollegeID)
-	if err != nil {
-		utils.SendErrorResponse(c, 400, "Invalid college ID")
+	if err != nil || collegeId <= 0 {
+		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid college ID")
 		return
 	}
 
 	if name == "" || email == "" || password == "" || collegeId == 0 {
-		utils.SendErrorResponse(c, 400, "All fields are required")
+		utils.SendErrorResponse(c, http.StatusBadRequest, "All fields are required")
 		return
 	}
 
 	// validate email and password
 
+	if len(name) < 4 {
+		utils.SendErrorResponse(c, http.StatusBadRequest, "Name must be at least 5 characters long")
+		return
+	}
+
+	err = validators.IsValidEmail(email)
+	if err != nil {
+		utils.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	isValid := validators.IsValidPassword(password)
+	if !isValid {
+		utils.SendErrorResponse(c, http.StatusBadRequest, "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one special character")
+		return
+	}
+
+	email = validators.NormalizeEmail(email)
+
 	// check if user exists
 	_, err = crud.GetUserLoginByEmail(email)
 	if err == nil {
-		utils.SendErrorResponse(c, 401, "User already exists")
+		utils.SendErrorResponse(c, http.StatusBadRequest, "User already exists")
 		return
 	}
 
 	// verify college
 	college, err := crud.GetCollegeById(uint(collegeId))
 	if err != nil {
-		utils.SendErrorResponse(c, 400, "Invalid college ID")
+		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid college ID")
 		return
 	}
 
 	if !college.Verified {
-		utils.SendErrorResponse(c, 400, "College not verified")
+		utils.SendErrorResponse(c, http.StatusBadRequest, "College not verified")
 		return
 	}
 
 	if college.EmailFormat != strings.Split(email, "@")[1] {
-		utils.SendErrorResponse(c, 400, "College email format does not match user email")
+		utils.SendErrorResponse(c, http.StatusBadRequest, "College email format does not match user email")
 		return
 	}
 
@@ -131,7 +152,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	user.RefreshToken = refreshToken    
+	user.RefreshToken = refreshToken
 	err = crud.UpdateUserLogin(&user)
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())

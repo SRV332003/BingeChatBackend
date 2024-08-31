@@ -3,6 +3,7 @@ package controllers
 import (
 	"HangAroundBackend/services/db/crud"
 	"HangAroundBackend/utils"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,15 +42,14 @@ func VerifyUser(c *gin.Context) {
 		return
 	}
 
-	// validate email and password
 	user, err := crud.GetUserByVerificationToken(token)
 	if err != nil {
-		utils.SendErrorResponse(c, 401, "Invalid token")
+		utils.SendErrorResponse(c, 400, "Invalid token")
 		return
 	}
 
 	if user.Verified {
-		utils.SendErrorResponse(c, 401, "User already verified")
+		utils.SendErrorResponse(c, http.StatusExpectationFailed, "User already verified")
 		return
 	}
 

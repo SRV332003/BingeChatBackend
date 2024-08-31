@@ -4,6 +4,8 @@ import (
 	"HangAroundBackend/services/customauth"
 	"HangAroundBackend/services/db/crud"
 	"HangAroundBackend/utils"
+	"HangAroundBackend/utils/validators"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -46,26 +48,39 @@ func CreateToken(c *gin.Context) {
 		return
 	}
 
+	err := validators.IsValidEmail(email)
+	if err != nil {
+		utils.SendErrorResponse(c, http.StatusExpectationFailed, err.Error())
+		return
+	}
+
+	if len(password) < 8 {
+		utils.SendErrorResponse(c, http.StatusExpectationFailed, "Invalid email or password")
+		return
+	}
+
+	email = validators.NormalizeEmail(email)
+
 	// validate email and password
 	user, err := crud.GetUserLoginByEmail(email)
 	if err != nil {
-		utils.SendErrorResponse(c, 401, "Invalid email or password")
+		utils.SendErrorResponse(c, http.StatusExpectationFailed, "Invalid email or password")
 		return
 	}
 
 	if user == nil {
-		utils.SendErrorResponse(c, 401, "Invalid email or password")
+		utils.SendErrorResponse(c, http.StatusExpectationFailed, "Invalid email or password")
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		utils.SendErrorResponse(c, 401, "Invalid email or password")
+		utils.SendErrorResponse(c, http.StatusExpectationFailed, "Invalid email or password")
 		return
 	}
 
 	if !user.Verified {
-		utils.SendErrorResponse(c, 401, "User not verified, please check your email for verification link")
+		utils.SendErrorResponse(c, http.StatusNotAcceptable, "User not verified, please check your email for verification link")
 		return
 	}
 
