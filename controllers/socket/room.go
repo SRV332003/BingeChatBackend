@@ -25,7 +25,7 @@ func (r *Room) Start() {
 		go client.Writer()
 		go client.Reader()
 	}
-	r.Send(json.RawMessage([]byte(`{"type": "init", "user": "`+r.clients[1].name+`",email: "`+r.clients[1].email+`"}`)), r.clients[0])
+	r.Send(json.RawMessage([]byte(`{"type": "init", "user": "`+r.clients[1].name+`","email": "`+r.clients[1].email+`"}`)), r.clients[0])
 }
 
 func (r *Room) Send(data json.RawMessage, sender *Client) {
