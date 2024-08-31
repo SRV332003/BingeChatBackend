@@ -75,6 +75,7 @@ func VerifyAuthCode(c *gin.Context) {
 		utils.SendSuccessResponse(c, 200, "User successfully logged in", gin.H{
 			"access_token":  access_token,
 			"refresh_token": refresh_token,
+			"name":          userLogin.Name,
 		})
 		return
 	}
@@ -138,5 +139,6 @@ func VerifyAuthCode(c *gin.Context) {
 	utils.SendSuccessResponse(c, 200, "User partially registered, please complete the registration", gin.H{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
+		"name":          userLogin.Name,
 	})
 }

@@ -25,14 +25,14 @@ func initRouter() *gin.Engine {
 		router.POST("/user/google", controllers.VerifyAuthCode)
 		router.GET("/college", controllers.GetCollege)
 		router.POST("/user/verify", controllers.VerifyUser)
+		router.GET("/user/token", controllers.ReCreateToken)
 	}
 	router.Use(middlewares.AuthMiddlware)
 	{
 		router.POST("/college", controllers.AddCollege)
-		router.GET("/user/token", controllers.ReCreateToken)
 		router.PUT("/user", controllers.UpdateUser)
 		router.GET("/user", controllers.GetUser)
-		router.HEAD("/user/google", controllers.VerifyToken)
+		router.HEAD("/user/token", controllers.VerifyToken)
 		router.GET("/chat", socket.SocketController)
 	}
 

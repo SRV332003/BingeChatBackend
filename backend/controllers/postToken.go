@@ -91,5 +91,6 @@ func CreateToken(c *gin.Context) {
 	utils.SendSuccessResponse(c, 200, "Successfully logged in", gin.H{
 		"refresh_token": refreshToken,
 		"access_token":  accessToken,
+		"name":          user.Name,
 	})
 }

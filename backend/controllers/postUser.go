@@ -141,6 +141,7 @@ func RegisterUser(c *gin.Context) {
 	utils.SendSuccessResponse(c, 200, "User registered successfully, please verify your email", gin.H{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
+		"name":          user.Name,
 	})
 }
 
