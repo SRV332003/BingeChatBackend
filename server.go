@@ -34,6 +34,7 @@ func initRouter() *gin.Engine {
 		router.GET("/user", controllers.GetUser)
 		router.HEAD("/user/token", controllers.VerifyToken)
 		router.GET("/chat", socket.SocketController)
+		router.GET("/user/verify", controllers.IsUserVerified)
 	}
 
 	app.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
