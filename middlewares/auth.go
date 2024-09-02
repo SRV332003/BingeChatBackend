@@ -38,7 +38,6 @@ func AuthMiddlware(c *gin.Context) {
 	claims, err := customauth.VerifyAccessToken(tokeString)
 	if err != nil {
 		utils.SendErrorResponse(c, http.StatusUnauthorized, "Invalid token")
-		c.AbortWithStatus(401)
 		return
 	}
 
