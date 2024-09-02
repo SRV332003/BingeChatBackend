@@ -23,10 +23,16 @@ func GetUser(c *gin.Context) {
 
 	user, err := crud.GetUserInfoByEmail(email)
 	if err != nil {
-		utils.SendErrorResponse(c, 500, "Internal Server Error")
+		utils.SendErrorResponse(c, 404, "User not found in db")
 		return
 	}
 
-	utils.SendSuccessResponse(c, 200, "Successfully fetched user", user)
+	utils.SendSuccessResponse(c, 200, "Successfully fetched user", gin.H{
+		"userId": user.ID,
+		"branch": user.PassoutYear,
+		"course": user.Course,
+		"rollNo": user.Rollno,
+		"dob":    user.DOB,
+	})
 
 }
