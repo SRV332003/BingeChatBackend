@@ -1,17 +1,22 @@
 package controllers
 
 import (
+	"HangAroundBackend/models"
+	"HangAroundBackend/services/db/crud"
 	"HangAroundBackend/utils"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type UpdateUserRequest struct {
 	Name        string `json:"name" `
 	Branch      string `json:"branch" `
 	PassoutYear string `json:"passout_year" `
-	Course      string `json:"course" `
-	RollNo      string `json:"roll_no" `
+	Course      string `json:"course"`
+	RollNo      string `json:"roll_no"`
+	ID          string `json:"userId" binding:"required"`
 }
 
 // UpdateUser godoc
@@ -31,7 +36,7 @@ func UpdateUser(c *gin.Context) {
 
 	var req UpdateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.SendErrorResponse(c, 400, "Bad Request: "+err.Error())
+		utils.SendErrorResponse(c, 400, "Bad Request: Invalid JSON format")
 		return
 	}
 
@@ -41,12 +46,25 @@ func UpdateUser(c *gin.Context) {
 
 	}
 
-	// userinfo := models.UserInfo{
-	// 	Rollno:      req.RollNo,
-	// 	Branch:      req.Branch,
-	// 	PassoutYear: req.PassoutYear,
-	// 	Course:      req.Course,
-	// }
+	id, err := strconv.Atoi(req.ID)
+	if err != nil || id <= 0 {
+		utils.SendErrorResponse(c, 400, "Invalid college ID")
+		return
+	}
+
+	userinfo := models.UserInfo{
+		Model:       gorm.Model{ID: uint(id)},
+		Rollno:      req.RollNo,
+		Branch:      req.Branch,
+		PassoutYear: req.PassoutYear,
+		Course:      req.Course,
+	}
+
+	err = crud.UpdateUserInfo(&userinfo)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Error Updating UserInfo")
+		return
+	}
 
 	utils.SendSuccessResponse(c, 200, "Successfully added cash", nil)
 }
