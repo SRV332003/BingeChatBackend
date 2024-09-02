@@ -44,6 +44,11 @@ func Migrate(childLogger *zap.Logger) {
 		childLogger.Panic("Error migrating College", zap.Error(err))
 	}
 
+	err = Instance.AutoMigrate(&models.Report{})
+	if err != nil {
+		childLogger.Panic("Error migrating Report", zap.Error(err))
+	}
+
 	childLogger.Info("Migrated tables")
 }
 
