@@ -34,6 +34,24 @@ func (c *Client) Reader() {
 		c.room.Close()
 	}()
 
+	c.conn.SetCloseHandler(func(code int, text string) error {
+		defer func() {
+			if r := recover(); r != nil {
+				switch r := r.(type) {
+				case string:
+					SocketLogger.Error("Recovered from panic: " + r)
+				case error:
+					SocketLogger.Error("Recovered from panic: " + r.Error())
+				default:
+					SocketLogger.Error("Recovered from panic")
+				}
+			}
+		}()
+		SocketLogger.Info("Client Connection Closed")
+		c.room.Close()
+		return nil
+	})
+
 	err := c.conn.SetReadDeadline(time.Now().Add(pongInterval))
 
 	if err != nil {
@@ -92,7 +110,6 @@ func (c *Client) Writer() {
 		}
 
 	}
-
 }
 
 func (c *Client) pongHandler(string) error {

@@ -18,7 +18,7 @@ func createLogger() *zap.Logger {
 		MaxAge:     7, // days
 	})
 
-	level := zap.NewAtomicLevelAt(zap.InfoLevel)
+	level := zapcore.WarnLevel
 
 	productionCfg := zap.NewProductionEncoderConfig()
 	productionCfg.TimeKey = "timestamp"

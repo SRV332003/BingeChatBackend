@@ -25,6 +25,7 @@ func (r *Room) Start() {
 		go client.Writer()
 		go client.Reader()
 	}
+	SocketLogger.Warn("Room Started with " + r.clients[0].email + " and " + r.clients[1].email)
 	r.Send(json.RawMessage([]byte(`{"type": "init", "user": "`+r.clients[1].name+`","email": "`+r.clients[1].email+`"}`)), r.clients[0])
 }
 
