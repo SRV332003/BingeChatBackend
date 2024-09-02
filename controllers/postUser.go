@@ -117,12 +117,20 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	userInfo := models.UserInfo{}
+	err = crud.CreateUserInfo(&userInfo)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Error creating User Information entry")
+		return
+	}
+
 	// hashedPassword := password
 	user := models.UserLogin{
 		Name:              name,
 		Email:             email,
 		Password:          string(hashedPassword),
 		CollegeID:         uint(collegeId),
+		UserInfo:          userInfo.ID,
 		Role:              "user",
 		VerificationToken: string(verifyToken),
 		Verified:          false,
