@@ -26,12 +26,13 @@ const (
 )
 
 func NewClient(conn *websocket.Conn, manager *Manager, email string, collegeID string, name string) *Client {
+	SocketLogger.Warn("New Client Created: " + email)
 	return &Client{conn: conn, room: nil, ch: make(chan []byte), email: email, collegeID: collegeID, name: name}
 }
 
 func (c *Client) Reader() {
 	defer func() {
-		c.room.Close()
+		c.conn.Close()
 	}()
 
 	c.conn.SetCloseHandler(func(code int, text string) error {
@@ -47,7 +48,7 @@ func (c *Client) Reader() {
 				}
 			}
 		}()
-		SocketLogger.Info("Client Connection Closed")
+		SocketLogger.Warn("Client Connection Closed")
 		c.room.Close()
 		return nil
 	})
@@ -64,7 +65,7 @@ func (c *Client) Reader() {
 	for {
 		_, payload, err := c.conn.ReadMessage()
 		if err != nil {
-			c.room.Close()
+			c.conn.Close()
 			break
 		}
 		var msg Event
@@ -83,7 +84,7 @@ func (c *Client) Reader() {
 
 func (c *Client) Writer() {
 	defer func() {
-		c.room.Close()
+		c.conn.Close()
 	}()
 
 	t := time.NewTicker(pingInterval)
