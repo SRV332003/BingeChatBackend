@@ -64,7 +64,7 @@ func ResetToken(c *gin.Context, refreshToken string, accessToken string) (*oauth
 
 func init() {
 
-	oauth2Config.RedirectURL = config.GetEnv("GOOGLE_REDIRECT_URI")
+	oauth2Config.RedirectURL = config.GetEnv("FRONTEND_URL") + "/googleCallback"
 	oauth2Config.ClientID = config.GetEnv("GOOGLE_CLIENT_ID")
 	oauth2Config.ClientSecret = config.GetEnv("GOOGLE_CLIENT_SECRET")
 }

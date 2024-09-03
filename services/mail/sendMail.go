@@ -36,7 +36,7 @@ func SendVerificationMail(to []string, Name string, token string) error {
 	var bodyBuf bytes.Buffer
 
 	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	bodyBuf.Write([]byte(fmt.Sprintf("Subject: %s \n%s\n\n", "Email Verification for HangAround", mimeHeaders)))
+	bodyBuf.Write([]byte(fmt.Sprintf("Subject: %s \n%s\n\n", "Email Verification for BingeChat", mimeHeaders)))
 
 	t.Execute(&bodyBuf, struct {
 		LINK string
@@ -59,7 +59,7 @@ func SendVerificationMail(to []string, Name string, token string) error {
 func init() {
 	from = config.GetEnv("MAIL_SERVICE_EMAIL")
 	password := config.GetEnv("MAIL_SERVICE_PASSWORD")
-	frontendUrl = config.GetEnv("CORS_ORIGIN")
+	frontendUrl = config.GetEnv("FRONTEND_URL")
 	// smtp server configuration.
 	smtpHost = "smtp.gmail.com"
 	smtpPort = "587"
