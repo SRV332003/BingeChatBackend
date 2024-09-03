@@ -167,10 +167,12 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	ControllerLogger.Info("Created user via register form: " + user.Email)
 	utils.SendSuccessResponse(c, 200, "User registered successfully, please verify your email", gin.H{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 		"name":          user.Name,
+		"email":         user.Email,
 	})
 }
 

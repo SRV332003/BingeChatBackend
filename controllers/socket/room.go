@@ -25,7 +25,7 @@ func (r *Room) Start() {
 		go client.Writer()
 		go client.Reader()
 	}
-	SocketLogger.Warn("Room Started with " + r.clients[0].email + " and " + r.clients[1].email)
+	SocketLogger.Info("Room Started with " + r.clients[0].email + " and " + r.clients[1].email)
 	r.Send(json.RawMessage([]byte(`{"type": "init", "user": "`+r.clients[1].name+`","email": "`+r.clients[1].email+`"}`)), r.clients[0])
 }
 
@@ -45,7 +45,7 @@ func (r *Room) Send(data json.RawMessage, sender *Client) {
 	for _, client := range r.clients {
 		if client != sender {
 			// send message data to client
-			SocketLogger.Info("Sending message " + string(data) + " to " + client.email + " from " + sender.email)
+			SocketLogger.Debug("Sending message " + string(data) + " to " + client.email + " from " + sender.email)
 			client.ch <- data
 		}
 	}

@@ -31,11 +31,11 @@ func NewManager() *Manager {
 }
 
 func (m *Manager) HandleConnections(c *gin.Context) {
-	SocketLogger.Info("Handling Connection")
+	SocketLogger.Debug("Handling Connection")
 	email := c.GetString("email")
 	collegeFormat := strings.Split(email, "@")[1]
 
-	SocketLogger.Info("Email, College in Header: " + email + " " + collegeFormat)
+	SocketLogger.Debug("Email, College in Header: " + email + " " + collegeFormat)
 
 	// Upgrade initial GET request to a websocket
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -47,7 +47,7 @@ func (m *Manager) HandleConnections(c *gin.Context) {
 
 	client := NewClient(ws, m, email, collegeFormat, name)
 
-	SocketLogger.Info("New Client Created")
+	SocketLogger.Debug("New Client Created")
 
 	m.AddClient(client)
 }
@@ -72,19 +72,19 @@ func (m *Manager) AddClient(client *Client) {
 
 func (m *Manager) RoomDispatcher() {
 	for client := range m.queue {
-		SocketLogger.Info("Room Dispatcher dealing with client: " + client.name)
+		SocketLogger.Debug("Room Dispatcher dealing with client: " + client.name)
 		_, exist := m.clients[client.collegeID]
 		if !exist {
 			m.clients[client.collegeID] = make([]*Client, 0)
 		}
 		m.clients[client.collegeID] = append(m.clients[client.collegeID], &client)
-		SocketLogger.Info("Client Added to Queue")
+		SocketLogger.Debug("Client Added to Queue")
 		if len(m.clients[client.collegeID]) == 2 {
 			room := NewRoom(m.clients[client.collegeID][0], m.clients[client.collegeID][1], m)
 			for _, client := range m.clients[client.collegeID] {
 				client.room = room
 			}
-			SocketLogger.Info("Room Created")
+			SocketLogger.Debug("Room Created")
 			m.addRoom(room)
 			room.Start()
 			delete(m.clients, client.collegeID)
