@@ -81,8 +81,8 @@ func RegisterUser(c *gin.Context) {
 	email = validators.NormalizeEmail(email)
 
 	// check if user exists
-	_, err = crud.GetUserLoginByEmail(email)
-	if err == nil {
+	exists, _, _ := crud.CheckUserLoginExists(email)
+	if exists {
 		utils.SendErrorResponse(c, http.StatusBadRequest, "User already exists")
 		return
 	}
@@ -135,12 +135,12 @@ func RegisterUser(c *gin.Context) {
 		VerificationToken: string(verifyToken),
 		Verified:          false,
 	}
+
 	err = mail.SendVerificationMail([]string{email}, name, string(verifyToken))
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
 		return
 	}
-
 	err = crud.CreateUserLogin(&user)
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
