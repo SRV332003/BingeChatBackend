@@ -66,6 +66,7 @@ func CreateReport(c *gin.Context) {
 		ReportText: text,
 	}
 
+	ControllerLogger.Info("Person '" + reportedMail + "' was reported by '" + reporterMail + "'")
 	err = crud.CreateReport(report)
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Error adding Report")

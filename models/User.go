@@ -22,7 +22,7 @@ type UserLogin struct {
 	College           College `json:"college"`
 	CollegeID         uint    `json:"college_id" gorm:"not null"`
 	Password          string
-	UserInfo       uint
+	UserInfo          uint
 }
 
 type College struct {

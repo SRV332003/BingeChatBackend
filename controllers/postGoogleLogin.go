@@ -100,8 +100,17 @@ func VerifyAuthCode(c *gin.Context) {
 	if userData["name"] == nil {
 		userData["name"] = splitMail[0]
 	}
+
+	userInfo := models.UserInfo{}
+	err = crud.CreateUserInfo(&userInfo)
+	if err != nil {
+		utils.SendErrorResponse(c, 500, "Error creating User Information entry")
+		return
+	}
+
 	// Create new user
 	userLogin = models.UserLogin{
+		UserInfo:          userInfo.ID,
 		Email:             userData["email"].(string),
 		Name:              userData["name"].(string),
 		Role:              "user",
@@ -136,7 +145,8 @@ func VerifyAuthCode(c *gin.Context) {
 		return
 	}
 
-	utils.SendSuccessResponse(c, 200, "User partially registered, please complete the registration", gin.H{
+	ControllerLogger.Info("Created user via Google Auth: " + userLogin.Email)
+	utils.SendSuccessResponse(c, 200, "User registered Successfully", gin.H{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 		"name":          userLogin.Name,

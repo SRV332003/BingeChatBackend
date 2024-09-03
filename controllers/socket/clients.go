@@ -26,7 +26,7 @@ const (
 )
 
 func NewClient(conn *websocket.Conn, manager *Manager, email string, collegeID string, name string) *Client {
-	SocketLogger.Warn("New Client Created: " + email)
+	SocketLogger.Info("New Client Created: " + email)
 	return &Client{conn: conn, room: nil, ch: make(chan []byte), email: email, collegeID: collegeID, name: name}
 }
 
@@ -48,7 +48,7 @@ func (c *Client) Reader() {
 				}
 			}
 		}()
-		SocketLogger.Warn("Client Connection Closed")
+		SocketLogger.Info("Client Connection Closed")
 		c.room.Close()
 		return nil
 	})
@@ -74,9 +74,9 @@ func (c *Client) Reader() {
 			log.Println("Unable to unmarshal msg:", err)
 		}
 		if msg.Type == initEvent {
-			SocketLogger.Warn("Init event received")
+			SocketLogger.Info("Init event received")
 		} else if msg.Type == exchangeEvent {
-			SocketLogger.Info("Exchange event received")
+			SocketLogger.Debug("Exchange event received")
 			c.room.Send(msg.Data, c)
 		}
 	}
@@ -102,7 +102,7 @@ func (c *Client) Writer() {
 			}
 			// log.Println("Message sent:", msg)
 		case <-t.C:
-			SocketLogger.Info("Sending ping to " + c.name)
+			SocketLogger.Debug("Sending ping to " + c.name)
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				SocketLogger.Error("Unable to send ping: " + err.Error())
 				return
@@ -114,6 +114,6 @@ func (c *Client) Writer() {
 }
 
 func (c *Client) pongHandler(string) error {
-	SocketLogger.Info("pong recieved from " + c.name)
+	SocketLogger.Debug("pong recieved from " + c.name)
 	return c.conn.SetReadDeadline(time.Now().Add(pongInterval))
 }

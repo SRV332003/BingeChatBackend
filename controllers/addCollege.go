@@ -1,13 +1,17 @@
 package controllers
 
 import (
+	"HangAroundBackend/logger"
 	"HangAroundBackend/models"
 	"HangAroundBackend/services/db/crud"
 	"HangAroundBackend/utils"
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
+
+var ControllerLogger *zap.Logger
 
 type AddCollegeRequest struct {
 	Name        string `json:"name" binding:"required"`
@@ -64,4 +68,8 @@ func AddCollege(c *gin.Context) {
 	}
 
 	utils.SendSuccessResponse(c, 200, "College added successfully", college)
+}
+
+func init() {
+	ControllerLogger = logger.GetLoggerWithName("Controller")
 }
