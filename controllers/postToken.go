@@ -107,5 +107,6 @@ func CreateToken(c *gin.Context) {
 		"refresh_token": refreshToken,
 		"access_token":  accessToken,
 		"name":          user.Name,
+		"email":         user.Email,
 	})
 }

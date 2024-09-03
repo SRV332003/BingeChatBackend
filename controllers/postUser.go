@@ -172,6 +172,7 @@ func RegisterUser(c *gin.Context) {
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 		"name":          user.Name,
+		"email":         user.Email,
 	})
 }
 

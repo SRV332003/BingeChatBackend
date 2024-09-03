@@ -76,6 +76,7 @@ func VerifyAuthCode(c *gin.Context) {
 			"access_token":  access_token,
 			"refresh_token": refresh_token,
 			"name":          userLogin.Name,
+			"email":         userLogin.Email,
 		})
 		return
 	}
@@ -150,5 +151,6 @@ func VerifyAuthCode(c *gin.Context) {
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 		"name":          userLogin.Name,
+		"email":         userLogin.Email,
 	})
 }
