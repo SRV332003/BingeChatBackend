@@ -67,6 +67,6 @@ func init() {
 	// Authentication.
 	auth = smtp.PlainAuth("", from, password, smtpHost)
 
-	from = "BingeChat <" + from + ">"
+	// from = "BingeChat <" + from + ">"
 
 }
