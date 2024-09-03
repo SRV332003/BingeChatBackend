@@ -135,7 +135,6 @@ func RegisterUser(c *gin.Context) {
 		VerificationToken: string(verifyToken),
 		Verified:          false,
 	}
-
 	err = mail.SendVerificationMail([]string{email}, name, string(verifyToken))
 	if err != nil {
 		utils.SendErrorResponse(c, 500, "Internal Server Error: "+err.Error())
@@ -167,7 +166,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	ControllerLogger.Info("Created user via register form: " + user.Email)
+	ControllerLogger.Info("Created user via register form: " + user.Email + " " + user.VerificationToken)
 	utils.SendSuccessResponse(c, 200, "User registered successfully, please verify your email", gin.H{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
