@@ -57,7 +57,7 @@ func SendVerificationMail(to []string, Name string, token string) error {
 }
 
 func init() {
-	from = config.GetEnv("MAIL_SERVICE_EMAIL")
+	from = "BingeChat <" + config.GetEnv("MAIL_SERVICE_EMAIL") + ">"
 	password := config.GetEnv("MAIL_SERVICE_PASSWORD")
 	frontendUrl = config.GetEnv("FRONTEND_URL")
 	// smtp server configuration.
