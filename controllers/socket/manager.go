@@ -80,6 +80,12 @@ func (m *Manager) RoomDispatcher() {
 		m.clients[client.collegeID] = append(m.clients[client.collegeID], &client)
 		SocketLogger.Debug("Client Added to Queue")
 		if len(m.clients[client.collegeID]) == 2 {
+			if m.clients[client.collegeID][0].email == m.clients[client.collegeID][1].email {
+				SocketLogger.Info("Same Email")
+				m.clients[client.collegeID] = m.clients[client.collegeID][1:]
+				continue
+			}
+
 			room := NewRoom(m.clients[client.collegeID][0], m.clients[client.collegeID][1], m)
 			for _, client := range m.clients[client.collegeID] {
 				client.room = room
