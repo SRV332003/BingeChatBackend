@@ -16,6 +16,7 @@ var ControllerLogger *zap.Logger
 type AddCollegeRequest struct {
 	Name        string `json:"name" binding:"required"`
 	EmailFormat string `json:"emailFormat" binding:"required"`
+	Pass  	string `json:"pass" binding:"required"`
 }
 
 // AddCollege godoc
@@ -45,6 +46,11 @@ func AddCollege(c *gin.Context) {
 
 	if name == "" || emailFormat == "" {
 		utils.SendErrorResponse(c, 400, "Please provide all the required fields")
+		return
+	}
+
+	if pass := req.Pass; pass != "#Chirag@Sourav3924" {
+		utils.SendErrorResponse(c, 400, "Invalid request")
 		return
 	}
 
