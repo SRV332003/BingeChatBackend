@@ -28,11 +28,11 @@ type AddCollegeRequest struct {
 // @Param emailFormat formData string true "Email Format"
 // @Router /api/v1/college [post]
 func AddCollege(c *gin.Context) {
-	role := c.GetString("role")
-	if role != "admin" {
-		utils.SendErrorResponse(c, 403, "You are not authorized to add college")
-		return
-	}
+	// role := c.GetString("role")
+	// if role != "admin" {
+	// 	utils.SendErrorResponse(c, 403, "You are not authorized to add college")
+	// 	return
+	// }
 
 	var req AddCollegeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

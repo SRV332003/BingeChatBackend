@@ -26,10 +26,10 @@ func initRouter() *gin.Engine {
 		router.GET("/college", controllers.GetCollege)
 		router.POST("/user/verify", controllers.VerifyUser)
 		router.GET("/user/token", controllers.ReCreateToken)
+		router.POST("/college", controllers.AddCollege)
 	}
 	router.Use(middlewares.AuthMiddlware)
 	{
-		router.POST("/college", controllers.AddCollege)
 		router.PUT("/user", controllers.UpdateUser)
 		router.GET("/user", controllers.GetUser)
 		router.HEAD("/user/token", controllers.VerifyToken)
