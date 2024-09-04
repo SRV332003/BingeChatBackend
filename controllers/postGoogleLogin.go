@@ -85,7 +85,7 @@ func VerifyAuthCode(c *gin.Context) {
 
 	exists, college, err := crud.CheckCollegeExists(splitMail[1])
 	if !exists || err != nil {
-		utils.SendErrorResponse(c, 403, "Your college is not registered with us.")
+		utils.SendErrorResponse(c, 403, "Your mail does not match with any college mails in our system. Please register your college first.")
 		return
 	}
 
