@@ -11,7 +11,7 @@ import (
 )
 
 var SocketLogger *zap.Logger
-var manager *Manager
+var manager *IntraManager
 
 // AddCashController godoc
 // @Summary Add cash to user account
@@ -46,7 +46,11 @@ func SocketController(c *gin.Context) {
 
 func init() {
 	SocketLogger = logger.GetLoggerWithName("socket")
-	manager = NewManager()
+	manager = &IntraManager{
+		clients: make(map[string]ClientList),
+		queue:   make(chan Client),
+		rooms:   make(RoomList),
+	}
 	go manager.RoomDispatcher()
 }
 

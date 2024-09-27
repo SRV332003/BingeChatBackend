@@ -25,7 +25,7 @@ const (
 	pingInterval = (pongInterval * 9) / 10
 )
 
-func NewClient(conn *websocket.Conn, manager *Manager, email string, collegeID string, name string) *Client {
+func NewClient(conn *websocket.Conn, email string, collegeID string, name string) *Client {
 	SocketLogger.Info("New Client Created: " + email)
 	return &Client{conn: conn, room: nil, ch: make(chan []byte), email: email, collegeID: collegeID, name: name}
 }
