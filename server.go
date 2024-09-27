@@ -6,6 +6,7 @@ import (
 	"HangAroundBackend/middlewares"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -15,6 +16,8 @@ import (
 // @description This is the documentation for backend APIs of Strive. You can explore the API endpoints here.
 func initRouter() *gin.Engine {
 	app := gin.Default()
+
+	app.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	app.Use(middlewares.CORSMiddleware())
 	router := app.Group("/api/v1")

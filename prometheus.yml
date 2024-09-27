@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 60s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+
+scrape_configs:
+  - job_name: 'hangaround_backend'
+    static_configs:
+      - targets: ['localhost:8080'] # Replace with your server's address and port
+
+remote_write:
+  - url: 'https://bingechat.grafana.net/api/prom/push' # Replace with your Grafana instance URL
+    basic_auth:
+      username: 'bingechat3924' # Replace with your Grafana username
+      password: '#Admin@Bingechat3924' # Replace with your Grafana password
